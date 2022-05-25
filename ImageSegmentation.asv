@@ -1,0 +1,82 @@
+clear all;
+close all;
+
+% x = [0 1 1 0];
+% y = [0 0 1 1];
+% color1 = patch(x,y,[85 250 100]./255);
+% imshow(color1);
+% 
+% c = [85 250 100]; % color tuple scaled to [0 255]
+% color1 = ones(80).*permute(c./255,[1 3 2]);
+% color2 = ones(80).*(c./255);
+% imshow(color1);
+% figure; imshow(color2);
+
+% Read Image
+img = imread("image6.jpg");
+figure; imshow(img), title('H&E image');
+text(size(img,2),size(img,1)+15, ...
+     "Image courtesy of Alan Partin, Johns Hopkins University", ...
+     "FontSize",7,"HorizontalAlignment","right");
+numColors = 4;
+[labeled, pixelLabels] = KmeansClustering(img, numColors);
+
+% Create Images that Segment H&E Image by Color
+mask1 = pixelLabels == 1;
+cluster1 = img.*uint8(mask1);
+figure; imshow(cluster1)
+title("Objects in Cluster 1");
+
+function palette = CreatePalette(img, pixelLabels, numColors)
+    palette = 
+    for i = 1:numColors
+        mask = pixelLabels == i;
+        cluster = img.*uint8(mask);
+        palette[i] = i;
+    end
+end
+
+function [labeled, pixelLabels] = KmeansClustering(img, numColors)
+% Classify Colors in RBG Color Space Using K-Means Clustering
+    pixelLabels = imsegkmeans(img,numColors);
+    % Display the label image as an overlay on the original image
+    labeled = labeloverlay(img,pixelLabels);
+    figure; imshow(labeled);
+    title("Labeled Image RGB");
+end
+
+% % Convert Image from RGB Color Space to HSV Color Space
+% hsv_he = rgb2hsv(img);
+% % 
+% % Classify Colors in H Space Using K-Means Clustering
+% hue = hsv_he(:,:,1);
+% hue = im2single(hue);
+% pixelLabels = imsegkmeans(hue,numColors,"NumAttempts",4);
+% % Display the label image as an overlay on the original image
+% B2 = labeloverlay(img,pixelLabels);
+% figure; imshow(B2)
+% title("Labeled Image Hue")
+% 
+% Create Images that Segment H&E Image by Color
+mask1 = pixelLabels == 1;
+cluster1 = img.*uint8(mask1);
+figure; imshow(cluster1)
+title("Objects in Cluster 1");
+
+
+
+
+% mask2 = pixelLabels == 2;
+% cluster2 = img.*uint8(mask2);
+% figure; imshow(cluster2)
+% title("Objects in Cluster 2");
+% 
+% mask3 = pixelLabels == 3;
+% cluster3 = img.*uint8(mask3);
+% figure; imshow(cluster3)
+% title("Objects in Cluster 3");
+% 
+% mask4 = pixelLabels == 4;
+% cluster4 = img.*uint8(mask4);
+% figure; imshow(cluster4)
+% title("Objects in Cluster 4");
